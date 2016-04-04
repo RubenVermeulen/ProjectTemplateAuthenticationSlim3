@@ -21,6 +21,12 @@ return [
 
     'auth' => [
         'session' => 'user_id',
-        'remember' => 'user_r'
+        'remember' => 'user_r',
     ],
+
+    'mailgun' => [
+        'public_key' => '',
+        'private_key' => '',
+        'domain' => '',
+    ]
 ];

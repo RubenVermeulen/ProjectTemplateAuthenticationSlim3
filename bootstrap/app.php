@@ -158,6 +158,14 @@ $container['flash'] = function($container) {
     return new \Slim\Flash\Messages();
 };
 
+$container['mailer'] = function($container) {
+    return new \App\Mail\MailerMailgun(
+        new \Mailgun\Mailgun($container->config->get('mailgun.private_key')),
+        $container->config,
+        $container->view
+    );
+};
+
 /*
 |--------------------------------------------------------------------------
 | Container Controllers
