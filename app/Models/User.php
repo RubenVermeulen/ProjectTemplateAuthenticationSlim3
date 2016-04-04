@@ -17,6 +17,8 @@ class User extends Model
         'password',
         'remember_identifier',
         'remember_token',
+        'active',
+        'active_hash',
     ];
 
     public function setPassword($password) {
@@ -36,6 +38,13 @@ class User extends Model
         $this->update([
             'remember_identifier' => null,
             'remember_token' => null
+        ]);
+    }
+
+    public function activateAccount() {
+        $this->update([
+            'active' => true,
+            'active_hash' => null,
         ]);
     }
 

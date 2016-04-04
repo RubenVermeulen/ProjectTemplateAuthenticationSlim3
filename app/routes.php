@@ -13,6 +13,8 @@ $app->group('', function() {
     $this->get('/auth/signin', 'AuthController:getSignIn')->setName('auth.signin');
     $this->post('/auth/signin', 'AuthController:postSignIn');
 
+    $this->get('/auth/activate', 'AuthController:getActivate')->setName('auth.activate');
+
 })->add(new GuestMiddleware($container));
 
 $app->group('', function() {

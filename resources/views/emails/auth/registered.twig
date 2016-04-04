@@ -1,0 +1,8 @@
+Hello
+<br><br>
+You've been registered, please click the URL below to activate your account.
+<br>
+<br>
+<a href="{{ base_url() }}{{ path_for('auth.activate') }}?email={{ user.email }}&identifier={{ identifier|url_encode }}">
+    {{ base_url() }}{{ path_for('auth.activate') }}?email={{ user.email }}&identifier={{ identifier|url_encode }}
+</a>

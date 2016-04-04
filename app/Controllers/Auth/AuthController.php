@@ -77,8 +77,8 @@ class AuthController extends Controller
 
     public function postSignUp(Request $request, Response $response) {
         $validation = $this->validator->validate($request, [
-            'email' => v::noWhitespace()->notEmpty()->email()->emailAvailable(),
-            'name' => v::notEmpty()->alpha(),
+            'email' => v::noWhitespace()->notEmpty()->email()->emailAvailable()->length(0, 255),
+            'name' => v::notEmpty()->alpha()->length(0, 255),
             'password' => v::noWhitespace()->notEmpty(),
         ]);
 
@@ -86,20 +86,34 @@ class AuthController extends Controller
             return $response->withRedirect($this->router->pathFor('auth.signup'));
         }
 
+        $identifier = $this->randomlib->generateString(128);
 
         $user = User::create([
             'email' => $request->getParam('email'),
             'name' => $request->getParam('name'),
             'password' => $this->auth->hashPassword($request->getParam('password')),
+            'active' => false,
+            'active_hash' => Hash::hash($identifier),
         ]);
 
         $user->permissions()->create([]);
 
-        $this->flash->addMessage('success', 'You have been signed up!');
+        $this->mailer->sendMessage(
+            'emails/auth/registered.twig',
+            [
+                'user' => $user,
+                'identifier' => $identifier,
+            ],
+            [
+                'from' => $this->config->get('address.noreply'),
+                'to' => $user->email,
+                'subject' => 'Registered',
+            ]
+        );
 
-        $this->auth->attempt($user->email, $request->getParam('password'));
+        $this->flash->addMessage('success', 'You have been signed up, please check your mailbox for an activation email!');
 
-        return $response->withRedirect($this->router->pathFor('home'));
+        return $response->withRedirect($this->router->pathFor('auth.signin'));
 
     }
 
@@ -107,5 +121,24 @@ class AuthController extends Controller
         $this->auth->logout();
 
         return $response->withRedirect($this->router->pathFor('home'));
+    }
+
+    public function getActivate(Request $request, Response $response) {
+        $email = $request->getParam('email');
+        $hashedIdentifier = Hash::hash($request->getParam('identifier'));
+
+        $user = User::where('email', $email)
+            ->where('active', false)
+            ->first();
+
+        if ( ! $user || ! Hash::hashCheck($hashedIdentifier, $user->active_hash)) {
+            $this->flash->addMessage('error', 'It was not possible to activate your account!');
+            return $response->withRedirect($this->router->pathFor('auth.signin'));
+        }
+
+        $user->activateAccount();
+
+        $this->flash->addMessage('success', 'Your account has been activated, you can now log in!');
+        return $response->withRedirect($this->router->pathFor('auth.signin'));
     }
 }
