@@ -1,0 +1,4 @@
+/config/production.php
+/config/development.php
+/.idea
+/vendor
