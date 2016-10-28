@@ -1,3 +1,7 @@
+# Slim 3 Project Template
+
+This is a base template to start some of my projects. It contains a basic authentication functionality. I choose Slim 3 as my framework and Twig as template engine.
+
 ## Installation
 ### Install dependencies
 Run following code. Make sure you have [composer](https://getcomposer.org/) installed.
